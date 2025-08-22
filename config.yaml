@@ -1,0 +1,121 @@
+# 海上风电场UAV-USV协同任务分配仿真配置
+# Configuration for Offshore Wind Farm UAV-USV Cooperative Task Allocation
+
+# 地图与数据设置
+map:
+  image: content.png              # 2048x2048 卫星影像
+  xml: content.xml                # PASCAL VOC 标注文件
+  gsd_m_per_px: 5.0              # 地面分辨率（米/像素）
+  grid_res_m: 10.0               # 栅格分辨率（米/格）
+  
+  # 安全缓冲距离设置
+  buffer:
+    rho_fan: 80.0                # 风机禁飞缓冲半径（米）
+    rho_uav: 40.0                # UAV障碍物膨胀半径（米）
+    rho_island: 10.0             # 岛屿外扩半径（米）
+
+# 智能体配置
+agents:
+  uav:
+    n: 5                         # UAV数量
+    v: 15.0                      # 飞行速度（米/秒）
+    Ecap: 160                    # 电池容量（能量单位）
+    alpha: 0.20                  # 移动能耗系数（能量单位/米）
+    reserve_ratio: 0.15          # 安全余量比例
+    eta_srv: 0.005               # 服务能耗系数（能量单位/秒）
+    eta_idle: 0.0005             # 空闲能耗系数（能量单位/秒）
+    
+  usv:
+    n: 1                         # USV数量
+    v: 5.0                       # 航行速度（米/秒）
+    Ecap: 1200                   # 电池容量（能量单位）
+    alpha: 0.05                  # 移动能耗系数（能量单位/米）
+    reserve_ratio: 0.10          # 安全余量比例
+    eta_srv: 0.0                 # 服务能耗系数（能量单位/秒）
+    eta_idle: 0.0001             # 空闲能耗系数（能量单位/秒）
+
+# 充电设置
+charging:
+  fixed:
+    default_rate: 6.0            # 默认充电功率（能量单位/秒）
+    default_K: 2                 # 默认充电桩数量
+    queue_policy: "FCFS"         # 排队策略（先来先服务）
+    
+  mobile:
+    enable: false                # 是否启用移动充电（USV充电）
+    R: 50.0                      # 移动充电服务半径（米）
+    rate: 3.0                    # 移动充电功率（能量单位/秒）
+
+# 任务设置
+tasks:
+  service_time_dist: "lognormal" # 服务时间分布类型
+  service_time_params:
+    mu: 3.0                      # 对数正态分布参数 μ
+    sigma: 0.5                   # 对数正态分布参数 σ
+  min_service_time: 60.0         # 最小服务时间（秒）
+  max_service_time: 600.0        # 最大服务时间（秒）
+
+# 奖励函数权重
+reward:
+  lambda_T: 1.0                  # 总完成时间权重
+  lambda_sigma: 0.2              # 负载均衡权重
+  lambda_E: 0.01                 # 能量消耗权重
+  lambda_Q: 0.05                 # 队列等待权重
+
+# 仿真参数
+sim:
+  dt: 2.0                        # 决策时间步长（秒）
+  horizon_s: 36000               # 仿真时长（秒，10小时）
+  max_episodes: 1000             # 最大回合数
+  
+  # 起始位置设置
+  start_policy: "base"           # 起始策略：base（基地）/random（随机）/distributed（分布式）
+  base_location: [0, 0]          # 基地坐标（米）
+
+# 扰动设置（用于鲁棒性测试）
+disturb:
+  v_sigma: 0.05                  # 速度扰动标准差（相对值）
+  alpha_sigma: 0.05              # 能耗扰动标准差（相对值）
+  dynamic_nfz: false             # 是否启用动态禁飞区
+  weather_effects: false         # 是否考虑天气影响
+
+# 观测空间设置
+observation:
+  top_k: 5                       # 观测最近k个节点
+  normalize: true                # 是否归一化观测值
+  include_global_state: true     # 是否包含全局状态信息
+
+# 动作空间设置  
+action:
+  type: "discrete"               # 动作类型：discrete（离散）
+  mask_infeasible: true          # 是否掩码不可行动作
+  include_stay: true             # 是否包含等待动作
+
+# 日志与调试
+logging:
+  level: "INFO"                  # 日志级别
+  save_trajectories: true        # 是否保存轨迹
+  save_events: true              # 是否保存事件日志
+  visualization: true            # 是否生成可视化
+
+# 实验设置
+experiment:
+  name: "wind_farm_marl"         # 实验名称
+  seeds: [42, 123, 456, 789, 999] # 随机种子列表
+  output_dir: "results"          # 输出目录
+  save_models: true              # 是否保存训练模型
+  
+# 算法配置（用于基线对比）
+algorithms:
+  milp:
+    solver: "PULP_CBC_CMD"       # MILP求解器
+    time_limit: 300              # 求解时间限制（秒）
+    
+  genetic:
+    population_size: 100         # 种群大小
+    generations: 50              # 进化代数
+    mutation_rate: 0.1           # 变异率
+    crossover_rate: 0.8          # 交叉率
+    
+  heuristic:
+    strategy: "nearest_neighbor" # 启发式策略

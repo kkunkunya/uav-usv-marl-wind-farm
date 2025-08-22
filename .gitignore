@@ -1,0 +1,121 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Spyder
+.spyderproject
+.spyproject
+
+# Research-specific exclusions
+# Large data files (will be documented in README)
+content.png
+*.tif
+*.tiff
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+
+# Generated cache and output files
+cache/
+grids/
+layers.pkl
+layers_preview.png
+grids_visualization.png
+*.h5
+*.hdf5
+*.parquet
+
+# Results and logs
+results/
+logs/
+outputs/
+experiments/results/
+*.log
+
+# Model checkpoints
+models/
+checkpoints/
+*.pt
+*.pth
+*.ckpt
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.DS_Store
+Thumbs.db
+
+# Ray/RLlib specific
+ray_results/
+~/ray_results/
+
+# Hydra outputs
+outputs/
+multirun/
+
+# OneDrive specific
+.OneDrive
+desktop.ini
+
+# Windows specific
+*.lnk
