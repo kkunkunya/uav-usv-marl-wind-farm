@@ -1,0 +1,64 @@
+# MAPPO Small场景配置
+# MAPPO configuration for Small scenario
+
+# 继承基础配置
+__base__: "base_config.yaml"
+
+# 实验信息
+experiment:
+  name: "mappo_small_baseline"
+  description: "MAPPO训练在Small场景的基线实验"
+  tags: ["mappo", "small", "baseline"]
+
+# 场景特定的训练参数
+training:
+  max_iterations: 500        # Small场景减少迭代次数
+  rollout_steps: 1024        # 减少rollout步数
+  n_envs: 8                  # 增加并行环境数
+  
+# 环境配置覆盖
+env_config:
+  scenario: "small"
+  
+  # Small场景参数
+  n_uav: 3
+  n_usv: 1
+  n_tasks: 10
+  n_charging_stations: 2
+  
+  # 地图设置
+  map_size: "small"
+  work_domain_scale: 0.5     # 缩小工作区域
+
+# MAPPO参数调整
+mappo:
+  # 适应小场景的参数
+  learning_rate: 5e-4        # 提高学习率
+  entropy_coef: 0.02         # 增加探索
+  n_epochs: 3                # 减少训练轮数
+  
+# 模型配置
+model:
+  # 小场景使用较小网络
+  actor_hidden_sizes: [128, 128]
+  critic_hidden_sizes: [256, 256]
+
+# 奖励函数配置
+reward:
+  lambda_T: 1.0              # 时间权重
+  lambda_sigma: 0.2          # 负载均衡权重
+  lambda_E: 0.01             # 能量权重
+  lambda_Q: 0.05             # 队列权重
+
+# 输出配置
+output:
+  output_dir: "experiments/rl/mappo_small"
+  
+# 种子配置
+seeds: [42, 123, 456, 789, 999]
+
+# 调试配置
+debug:
+  log_rollout_stats: true
+  save_attention_weights: false
+  plot_training_curves: true

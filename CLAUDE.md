@@ -143,8 +143,11 @@ If you have problems or questions while programming, communicate with me promptl
 
 Please proceed with the programming work based on the core plan and mathematical derivations in the Plan folder
 
+Specify Microsoft YaHei as the font for generating charts to ensure Chinese characters are rendered properly in the charts
+
 ## Environment Configuration
 
-Run Python using conda virtual environment
+Run the test using python under this path: C:\Users\sxk27\anaconda3\envs\marl_uav_usv\python.exe
+
 
 

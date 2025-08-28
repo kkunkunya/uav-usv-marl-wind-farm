@@ -27,13 +27,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def run_command(cmd: list, description: str) -> bool:
+def run_command(cmd: list, description: str, realtime_output: bool = False) -> bool:
     """
     运行命令并检查结果
     
     Args:
         cmd: 命令列表
         description: 命令描述
+        realtime_output: 是否显示实时输出
         
     Returns:
         是否成功执行
@@ -44,19 +45,52 @@ def run_command(cmd: list, description: str) -> bool:
     start_time = time.time()
     
     try:
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        
-        elapsed = time.time() - start_time
-        logger.info(f"✓ {description} 完成 (耗时 {elapsed:.1f}s)")
-        
-        # 输出标准输出的关键信息
-        if result.stdout:
-            lines = result.stdout.strip().split('\n')
-            for line in lines[-5:]:  # 只显示最后5行
-                if line.strip():
-                    logger.info(f"  {line}")
-        
-        return True
+        if realtime_output:
+            # 实时输出模式
+            logger.info(f"🔄 {description} 执行中...")
+            process = subprocess.Popen(
+                cmd, 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1,
+                universal_newlines=True
+            )
+            
+            output_lines = []
+            for line in iter(process.stdout.readline, ''):
+                line = line.rstrip()
+                if line:
+                    logger.info(f"  📝 {line}")
+                    output_lines.append(line)
+            
+            process.stdout.close()
+            return_code = process.wait()
+            
+            elapsed = time.time() - start_time
+            
+            if return_code == 0:
+                logger.info(f"✓ {description} 完成 (耗时 {elapsed:.1f}s)")
+                return True
+            else:
+                logger.error(f"✗ {description} 失败 (耗时 {elapsed:.1f}s)")
+                logger.error(f"返回码: {return_code}")
+                return False
+        else:
+            # 原有的批量输出模式
+            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            
+            elapsed = time.time() - start_time
+            logger.info(f"✓ {description} 完成 (耗时 {elapsed:.1f}s)")
+            
+            # 输出标准输出的关键信息
+            if result.stdout:
+                lines = result.stdout.strip().split('\n')
+                for line in lines[-5:]:  # 只显示最后5行
+                    if line.strip():
+                        logger.info(f"  {line}")
+            
+            return True
         
     except subprocess.CalledProcessError as e:
         elapsed = time.time() - start_time
@@ -114,7 +148,7 @@ def run_layers_step(config_file: str, xml_file: str) -> bool:
         "--visualize"
     ]
     
-    return run_command(cmd, "构建地图层")
+    return run_command(cmd, "构建地图层", realtime_output=True)
 
 
 def run_grids_step(config_file: str) -> bool:
@@ -136,7 +170,7 @@ def run_grids_step(config_file: str) -> bool:
         "--visualize"
     ]
     
-    return run_command(cmd, "构建导航栅格")
+    return run_command(cmd, "构建导航栅格", realtime_output=True)
 
 
 def run_cache_step(config_file: str) -> bool:
@@ -164,7 +198,7 @@ def run_cache_step(config_file: str) -> bool:
         "--output", "cache"
     ]
     
-    return run_command(cmd, "构建路径缓存")
+    return run_command(cmd, "构建路径缓存", realtime_output=True)
 
 
 def run_validate_step(config_file: str, xml_file: str) -> bool:

@@ -1,0 +1,76 @@
+# MAPPO基础配置文件
+# Base configuration for MAPPO training
+
+# 训练参数
+training:
+  algorithm: "MAPPO"
+  max_iterations: 1000
+  rollout_steps: 2048        # 每次收集的步数
+  n_envs: 4                  # 并行环境数量
+  device: "cuda"             # 设备类型（cuda/cpu）
+  
+  # 评估参数
+  eval_freq: 10              # 评估频率（每N次迭代）
+  eval_episodes: 20          # 评估回合数
+  eval_seeds: [42, 123, 456, 789, 999]  # 评估种子列表
+  
+  # 早停参数
+  patience: 10               # 早停耐心值
+  max_checkpoints: 5         # 最大保存检查点数
+
+# MAPPO算法参数
+mappo:
+  # PPO核心参数
+  gamma: 0.99                # 折扣因子
+  gae_lambda: 0.95           # GAE参数
+  clip_range: 0.2            # PPO裁剪范围
+  n_epochs: 4                # 每次更新的轮数
+  n_minibatches: 8           # 小批次数量
+  
+  # 损失权重
+  value_coef: 0.5            # 价值损失系数
+  entropy_coef: 0.01         # 熵正则化系数
+  
+  # 优化参数
+  learning_rate: 3e-4        # 学习率
+  lr_decay: true             # 是否使用学习率衰减
+  max_grad_norm: 0.5         # 梯度裁剪阈值
+
+# 神经网络模型配置
+model:
+  # 网络结构
+  shared_backbone: false     # 是否使用共享特征提取器
+  
+  # Actor网络
+  actor_hidden_sizes: [256, 256]
+  
+  # Critic网络
+  critic_hidden_sizes: [512, 512]
+  use_centralized_critic: true
+  
+  # 通用参数
+  activation: "relu"         # 激活函数（relu/tanh/silu）
+  use_layer_norm: false      # 是否使用Layer Normalization
+
+# 环境配置
+env_config:
+  config_path: "config.yaml"
+  layers_path: "layers.pkl"
+  cache_dir: "cache"
+  
+  # 环境包装器
+  use_obs_norm: true         # 是否使用观测归一化
+  use_action_masking: true   # 是否使用动作掩码适配
+
+# 输出配置
+output:
+  output_dir: "experiments/rl"
+  save_models: true
+  save_trajectories: false
+  log_level: "INFO"
+
+# 资源配置
+resources:
+  num_cpus: 4
+  num_gpus: 1
+  memory_limit: "8GB"

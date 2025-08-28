@@ -22,6 +22,10 @@ from shapely.validation import make_valid
 from shapely import affinity
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+
+# 配置中文字体显示
+plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
+plt.rcParams['axes.unicode_minus'] = False
 from dataclasses import dataclass, field
 import hashlib
 
@@ -66,9 +70,9 @@ class ChargingStation:
     id: str
     position: Tuple[float, float]   # 世界坐标位置
     service_area: Polygon           # 服务区域
+    original_object: DetectedObject # 原始检测对象
     capacity: int = 2               # 充电桩数量
     power: float = 6.0             # 充电功率
-    original_object: DetectedObject # 原始检测对象
     attributes: Dict = field(default_factory=dict)
 
 

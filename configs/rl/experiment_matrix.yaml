@@ -1,0 +1,107 @@
+# 实验矩阵配置
+# Experiment Matrix Configuration
+# 用于批量执行不同配置的实验
+
+# 基础配置模板
+base_config: "base_config.yaml"
+
+# 实验矩阵维度
+dimensions:
+  # 场景规模
+  scenario:
+    - name: "small"
+      n_uav: 3
+      n_usv: 1
+      n_tasks: 10
+      max_iterations: 500
+    - name: "medium"  
+      n_uav: 5
+      n_usv: 1
+      n_tasks: 25
+      max_iterations: 1000
+
+  # 禁飞区配置
+  no_fly_zone:
+    - name: "disabled"
+      enable_uav_obstacles: false
+      rho_fan: 60.0
+    - name: "enabled_60"
+      enable_uav_obstacles: true
+      rho_fan: 60.0
+    - name: "enabled_100"
+      enable_uav_obstacles: true
+      rho_fan: 100.0
+    - name: "enabled_140"
+      enable_uav_obstacles: true
+      rho_fan: 140.0
+
+  # 能量配置
+  energy:
+    - name: "low"
+      uav_capacity: 120
+      reserve_ratio: 0.15
+    - name: "medium"
+      uav_capacity: 160
+      reserve_ratio: 0.15
+    - name: "high"
+      uav_capacity: 200
+      reserve_ratio: 0.10
+
+  # 算法配置
+  algorithm:
+    - name: "mappo"
+      algorithm: "MAPPO"
+      learning_rate: 3e-4
+      clip_range: 0.2
+    # 将来扩展QMIX
+    # - name: "qmix"
+    #   algorithm: "QMIX"
+    #   learning_rate: 5e-4
+
+  # 负载均衡权重
+  load_balance:
+    - name: "none"
+      lambda_sigma: 0.0
+    - name: "low"
+      lambda_sigma: 0.1
+    - name: "medium" 
+      lambda_sigma: 0.2
+    - name: "high"
+      lambda_sigma: 0.4
+
+# 种子配置
+seeds: [42, 123, 456, 789, 999]
+
+# 实验选择（可以选择性执行部分实验）
+experiment_filters:
+  # 优先级实验（快速验证）
+  priority:
+    scenario: ["small"]
+    algorithm: ["mappo"]
+    load_balance: ["none", "medium"]
+    
+  # 完整实验
+  full:
+    scenario: ["small", "medium"]
+    no_fly_zone: ["disabled", "enabled_100"] 
+    energy: ["medium"]
+    algorithm: ["mappo"]
+    load_balance: ["none", "low", "medium", "high"]
+
+# 输出配置
+output:
+  base_dir: "experiments/matrix"
+  naming_pattern: "{algorithm}_{scenario}_{no_fly_zone}_{energy}_{load_balance}"
+  
+# 执行配置
+execution:
+  max_parallel_jobs: 2       # 最大并行作业数
+  retry_failed: true         # 是否重试失败的作业
+  timeout_hours: 12          # 单个作业超时时间（小时）
+  
+# 资源配置
+resources:
+  per_job:
+    num_cpus: 2
+    num_gpus: 0.5
+    memory_gb: 4

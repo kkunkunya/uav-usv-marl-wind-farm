@@ -1,0 +1,82 @@
+debug:
+  log_rollout_stats: true
+  plot_training_curves: true
+  save_attention_weights: false
+env_config:
+  cache_dir: cache
+  config_path: config.yaml
+  layers_path: layers.pkl
+  map_size: small
+  n_charging_stations: 2
+  n_tasks: 10
+  n_uav: 3
+  n_usv: 1
+  scenario: small
+  use_action_masking: true
+  use_obs_norm: true
+  work_domain_scale: 0.5
+experiment:
+  description: MAPPO训练在Small场景的基线实验
+  name: mappo_small_baseline
+  tags:
+  - mappo
+  - small
+  - baseline
+mappo:
+  clip_range: 0.2
+  entropy_coef: 0.02
+  gae_lambda: 0.95
+  gamma: 0.99
+  learning_rate: 5e-4
+  lr_decay: true
+  max_grad_norm: 0.5
+  n_epochs: 3
+  n_minibatches: 8
+  value_coef: 0.5
+model:
+  activation: relu
+  actor_hidden_sizes:
+  - 128
+  - 128
+  critic_hidden_sizes:
+  - 256
+  - 256
+  shared_backbone: false
+  use_centralized_critic: true
+  use_layer_norm: false
+output:
+  log_level: INFO
+  output_dir: experiments\rl\mappo_small\test_small
+  save_models: true
+  save_trajectories: false
+resources:
+  memory_limit: 8GB
+  num_cpus: 4
+  num_gpus: 1
+reward:
+  lambda_E: 0.01
+  lambda_Q: 0.05
+  lambda_T: 1.0
+  lambda_sigma: 0.2
+seeds:
+- 42
+- 123
+- 456
+- 789
+- 999
+training:
+  algorithm: MAPPO
+  device: cuda
+  eval_episodes: 20
+  eval_freq: 10
+  eval_seeds:
+  - 42
+  - 123
+  - 456
+  - 789
+  - 999
+  max_checkpoints: 5
+  max_iterations: 500
+  n_envs: 8
+  patience: 10
+  rollout_steps: 1024

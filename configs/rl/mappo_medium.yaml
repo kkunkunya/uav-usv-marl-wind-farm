@@ -1,0 +1,58 @@
+# MAPPO Medium场景配置
+# MAPPO configuration for Medium scenario
+
+# 继承基础配置
+__base__: "base_config.yaml"
+
+# 实验信息
+experiment:
+  name: "mappo_medium_baseline"
+  description: "MAPPO训练在Medium场景的基线实验"
+  tags: ["mappo", "medium", "baseline"]
+
+# 场景特定的训练参数
+training:
+  max_iterations: 1000       # Medium场景标准迭代次数
+  rollout_steps: 2048
+  n_envs: 4                  # Medium场景环境数
+  
+# 环境配置覆盖
+env_config:
+  scenario: "medium"
+  
+  # Medium场景参数
+  n_uav: 5
+  n_usv: 1
+  n_tasks: 25
+  n_charging_stations: 2
+  
+  # 地图设置
+  map_size: "medium"
+  work_domain_scale: 1.0
+
+# MAPPO参数
+mappo:
+  # 标准参数
+  learning_rate: 3e-4
+  entropy_coef: 0.01
+  n_epochs: 4
+  
+# 模型配置
+model:
+  # 标准网络大小
+  actor_hidden_sizes: [256, 256]
+  critic_hidden_sizes: [512, 512]
+
+# 奖励函数配置
+reward:
+  lambda_T: 1.0
+  lambda_sigma: 0.2
+  lambda_E: 0.01
+  lambda_Q: 0.05
+
+# 输出配置
+output:
+  output_dir: "experiments/rl/mappo_medium"
+  
+# 种子配置
+seeds: [42, 123, 456, 789, 999]

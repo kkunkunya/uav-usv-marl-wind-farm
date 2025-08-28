@@ -22,6 +22,10 @@ import rasterio
 from rasterio.features import rasterize
 from rasterio.transform import from_bounds
 import matplotlib.pyplot as plt
+
+# 配置中文字体显示
+plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
+plt.rcParams['axes.unicode_minus'] = False
 import networkx as nx
 from dataclasses import dataclass, field
 import cv2
