@@ -1,0 +1,96 @@
+action:
+  include_stay: true
+  mask_infeasible: true
+  type: discrete
+agents:
+  uav:
+    Ecap: 8000
+    alpha: 0.005
+    eta_idle: 0.0001
+    eta_srv: 0.001
+    n: 5
+    reserve_ratio: 0.05
+    v: 15.0
+  usv:
+    Ecap: 4800
+    alpha: 0.008
+    eta_idle: 2.0e-05
+    eta_srv: 0.0
+    n: 1
+    reserve_ratio: 0.02
+    v: 5.0
+algorithms:
+  genetic:
+    crossover_rate: 0.8
+    generations: 50
+    mutation_rate: 0.1
+    population_size: 100
+  heuristic:
+    strategy: nearest_neighbor
+  milp:
+    solver: PULP_CBC_CMD
+    time_limit: 300
+charging:
+  fixed:
+    default_K: 3
+    default_rate: 12.0
+    queue_policy: FCFS
+  mobile:
+    R: 50.0
+    enable: false
+    rate: 3.0
+debug:
+  print_reward_details: true
+disturb:
+  alpha_sigma: 0.05
+  dynamic_nfz: false
+  v_sigma: 0.05
+  weather_effects: false
+experiment:
+  name: wind_farm_marl
+  output_dir: results
+  save_models: true
+  seeds:
+  - 42
+  - 123
+  - 456
+  - 789
+  - 999
+logging:
+  level: INFO
+  save_events: true
+  save_trajectories: true
+  visualization: true
+map:
+  buffer:
+    rho_fan: 50.0
+    rho_island: 10.0
+    rho_uav: 20.0
+  grid_res_m: 10.0
+  gsd_m_per_px: 5.0
+  image: content.png
+  xml: content.xml
+observation:
+  include_global_state: true
+  normalize: true
+  top_k: 5
+reward:
+  lambda_E: 0.01
+  lambda_Q: 0.05
+  lambda_T: 1.0
+  lambda_sigma: 0.2
+sim:
+  base_location:
+  - 0
+  - 0
+  dt: 2.0
+  horizon_s: 36000
+  max_episodes: 1000
+  start_policy: base
+tasks:
+  max_service_time: 600.0
+  min_service_time: 60.0
+  service_time_dist: lognormal
+  service_time_params:
+    mu: 3.0
+    sigma: 0.5

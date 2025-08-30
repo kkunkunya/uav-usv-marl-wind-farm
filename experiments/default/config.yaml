@@ -1,36 +1,44 @@
 debug:
   log_rollout_stats: true
   plot_training_curves: true
+  print_reward_details: false
   save_attention_weights: false
+early_stopping:
+  enabled: true
+  min_delta: 0.001
+  monitor: eval_reward_mean
+  patience: 15
 env_config:
   cache_dir: cache
   config_path: config.yaml
   layers_path: layers.pkl
   map_size: small
-  n_charging_stations: 2
-  n_tasks: 10
-  n_uav: 3
+  n_charging_stations: 3
+  n_tasks: 39
+  n_uav: 5
   n_usv: 1
   scenario: small
   use_action_masking: true
   use_obs_norm: true
   work_domain_scale: 0.5
 experiment:
-  description: MAPPO训练在Small场景的基线实验
-  name: mappo_small_baseline
+  description: 'Phase 1: 修复后奖励系统的首次真正MARL学习验证'
+  name: phase1_true_baseline
   tags:
   - mappo
-  - small
-  - baseline
+  - phase1
+  - reward_fixed
+  - learning_verification
+  version: v1.0_reward_fixed
 mappo:
   clip_range: 0.2
-  entropy_coef: 0.02
+  entropy_coef: 0.01
   gae_lambda: 0.95
   gamma: 0.99
-  learning_rate: 5e-4
+  learning_rate: 3e-4
   lr_decay: true
   max_grad_norm: 0.5
-  n_epochs: 3
+  n_epochs: 4
   n_minibatches: 8
   value_coef: 0.5
 model:
@@ -44,11 +52,26 @@ model:
   shared_backbone: false
   use_centralized_critic: true
   use_layer_norm: false
+monitoring:
+  log_frequency: 10
+  save_frequency: 5
+  wandb_project: marl_uav_usv_phase1
 output:
+  checkpoint_freq: 5
   log_level: INFO
-  output_dir: experiments\rl\mappo_small\test_small
+  output_dir: experiments\rl\phase1_true_baseline\phase1_fixed_energy_system
   save_models: true
-  save_trajectories: false
+  save_trajectories: true
+phase1_config:
+  expected_reward_range:
+  - -1.0
+  - 0.0
+  goal: 验证修复后环境的学习能力
+  success_criteria:
+  - 奖励值保持在合理范围内
+  - 观察到明显的学习曲线
+  - 智能体展现协作行为
+  - 无系统崩溃或数值异常
 resources:
   memory_limit: 8GB
   num_cpus: 4
@@ -62,21 +85,17 @@ seeds:
 - 42
 - 123
 - 456
-- 789
-- 999
 training:
   algorithm: MAPPO
   device: cuda
-  eval_episodes: 20
-  eval_freq: 10
+  eval_episodes: 10
+  eval_freq: 5
   eval_seeds:
   - 42
   - 123
   - 456
-  - 789
-  - 999
-  max_checkpoints: 5
-  max_iterations: 500
-  n_envs: 8
-  patience: 10
+  max_checkpoints: 10
+  max_iterations: 200
+  n_envs: 6
+  patience: 20
   rollout_steps: 1024

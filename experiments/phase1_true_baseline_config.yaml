@@ -1,0 +1,124 @@
+# Phase 1 真正基线训练配置
+# 首次在修复后奖励系统上的学习能力验证
+
+debug:
+  log_rollout_stats: true
+  plot_training_curves: true
+  save_attention_weights: false
+  print_reward_details: false  # 避免日志过多，专注训练
+
+env_config:
+  cache_dir: cache
+  config_path: config.yaml
+  layers_path: layers.pkl
+  map_size: small
+  n_charging_stations: 3  # 使用修复后的3个充电站
+  n_tasks: 39             # 使用完整任务集
+  n_uav: 5               # 完整UAV配置
+  n_usv: 1               # 1个USV
+  scenario: small
+  use_action_masking: true
+  use_obs_norm: true
+  work_domain_scale: 0.5
+
+experiment:
+  description: "Phase 1: 修复后奖励系统的首次真正MARL学习验证"
+  name: phase1_true_baseline
+  tags:
+  - mappo
+  - phase1
+  - reward_fixed
+  - learning_verification
+  version: "v1.0_reward_fixed"
+
+# MAPPO超参数 - 为修复后的奖励尺度优化
+mappo:
+  clip_range: 0.2
+  entropy_coef: 0.01        # 略低于默认，因为奖励信号现在清晰
+  gae_lambda: 0.95
+  gamma: 0.99
+  learning_rate: 3e-4      # 稍低学习率，适合新的奖励尺度
+  lr_decay: true
+  max_grad_norm: 0.5
+  n_epochs: 4              # 增加epoch，充分利用有效奖励信号
+  n_minibatches: 8
+  value_coef: 0.5
+
+# 神经网络架构
+model:
+  activation: relu
+  actor_hidden_sizes:
+  - 128
+  - 128
+  critic_hidden_sizes:
+  - 256
+  - 256
+  shared_backbone: false
+  use_centralized_critic: true
+  use_layer_norm: false
+
+# 输出配置
+output:
+  log_level: INFO
+  output_dir: experiments/rl/phase1_true_baseline
+  save_models: true
+  save_trajectories: true  # 保存轨迹用于分析学习行为
+  checkpoint_freq: 5       # 更频繁保存检查点
+
+# 资源配置
+resources:
+  memory_limit: 8GB
+  num_cpus: 4
+  num_gpus: 1
+
+# 奖励权重 - 当前基线配置（修复后版本）
+reward:
+  lambda_E: 0.01
+  lambda_Q: 0.05
+  lambda_T: 1.0
+  lambda_sigma: 0.2
+
+# 训练种子
+seeds:
+- 42
+- 123
+- 456
+
+# 训练配置
+training:
+  algorithm: MAPPO
+  device: cuda
+  eval_episodes: 10        # 减少评估时间，更专注训练
+  eval_freq: 5            # 更频繁评估，观察学习进展
+  eval_seeds:
+  - 42
+  - 123
+  - 456
+  max_checkpoints: 10     # 保存更多检查点
+  max_iterations: 200     # 先跑200轮观察学习效果
+  n_envs: 6              # 6个并行环境，匹配智能体数量
+  patience: 20           # 更大耐心，给学习更多时间
+  rollout_steps: 1024
+  
+# 早停和收敛检测
+early_stopping:
+  enabled: true
+  patience: 15
+  min_delta: 0.001       # 奖励改善阈值，适配新的奖励尺度
+  monitor: "eval_reward_mean"
+
+# 学习曲线监控
+monitoring:
+  wandb_project: "marl_uav_usv_phase1"
+  log_frequency: 10
+  save_frequency: 5
+  
+# Phase 1 特定配置
+phase1_config:
+  goal: "验证修复后环境的学习能力"
+  expected_reward_range: [-1.0, 0.0]  # 基于测试结果的预期范围
+  success_criteria:
+    - "奖励值保持在合理范围内"
+    - "观察到明显的学习曲线"
+    - "智能体展现协作行为"
+    - "无系统崩溃或数值异常"
