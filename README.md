@@ -1,5 +1,10 @@
 # 海上风电场UAV-USV协同任务分配仿真平台
 
+## Portfolio positioning
+
+This is a research portfolio project for multi-agent reinforcement learning in UAV-USV cooperative task allocation. It is one of the primary public repositories representing my algorithm and simulation work.
+
+
 多智能体强化学习框架，用于海上风电场无人机与无人船协同任务分配和路径规划研究。
 
 ## 项目结构
